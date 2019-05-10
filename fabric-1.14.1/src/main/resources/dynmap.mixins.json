@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "org.dynmap.fabric_1_14_1.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MinecraftServerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

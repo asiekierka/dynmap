@@ -1,0 +1,67 @@
+plugins {
+	id 'fabric-loom' version '0.2.2-SNAPSHOT'
+}
+
+dependencies {
+    compile project(":DynmapCore")
+    compile project(":DynmapCoreAPI")
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+ext.buildNumber = System.getenv().BUILD_NUMBER ?: "Dev"
+
+minecraft {
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:1.14.1 Pre-Release 2"
+	mappings "net.fabricmc:yarn:1.14.1 Pre-Release 2+build.1"
+	modCompile "net.fabricmc:fabric-loader:0.4.6+build.143"
+}
+
+project.archivesBaseName = "${project.archivesBaseName}-fabric-1.14.1"
+
+processResources {
+	inputs.property "version", project.version
+
+	from(sourceSets.main.resources.srcDirs) {
+		include "fabric.mod.json"
+		expand "version": project.version + '+build.' + project.ext.buildNumber
+	}
+
+	from(sourceSets.main.resources.srcDirs) {
+		exclude "fabric.mod.json"
+	}
+}
+
+shadowJar {
+    dependencies {
+        include(dependency('com.googlecode.json-simple:json-simple:'))
+		include(dependency('org.yaml:snakeyaml:'))
+		include(dependency('com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:'))
+        include(dependency('org.eclipse.jetty::'))
+        include(dependency('org.eclipse.jetty.orbit:javax.servlet:'))
+        include(dependency(':DynmapCore'))
+        include(dependency(':DynmapCoreAPI'))
+		include(dependency(':dynmap-api'))
+	}
+	relocate('org.json.simple', 'org.dynmap.json.simple')
+	relocate('org.yaml.snakeyaml', 'org.dynmap.snakeyaml')
+	relocate('org.eclipse.jetty', 'org.dynmap.jetty')
+	relocate('org.owasp.html', 'org.dynmap.org.owasp.html')
+	relocate('javax.servlet', 'org.dynmap.javax.servlet' )
+    archiveName = "Dynmap-${parent.version}-fabric-1.14.1.jar"
+    destinationDir = file '../target'
+}
+
+task remapShadowJar(type: net.fabricmc.loom.task.RemapJar, dependsOn: tasks.shadowJar) {
+    jar = shadowJar.archivePath
+}
+
+remapShadowJar.doLast {
+    task ->
+        ant.checksum file: task.archivePath
+}
+
+build.dependsOn(remapShadowJar)

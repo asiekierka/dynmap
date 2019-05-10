@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "dynmap",
+  "version": "${version}",
+
+  "name": "Dynmap",
+
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "org.dynmap.fabric_1_14_1.DynmapFabric"
+    ]
+  },
+  "mixins": [
+    "dynmap.mixins.json"
+  ],
+
+  "requires": {
+    "fabricloader": ">=0.4.6"
+  }
+}
